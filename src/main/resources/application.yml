@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    url: jdbc:mysql://localhost/gestion_salle?createDatabaseIfNotExist=true
+    username: root
+    password:
+    driverClassName: com.mysql.cj.jdbc.Driver
+server:
+    port: 8080

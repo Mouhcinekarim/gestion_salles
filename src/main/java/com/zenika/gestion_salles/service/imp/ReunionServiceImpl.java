@@ -5,6 +5,7 @@ import com.zenika.gestion_salles.entity.Reunion;
 import com.zenika.gestion_salles.entity.Salle;
 import com.zenika.gestion_salles.enums.Equipement;
 import com.zenika.gestion_salles.enums.TypeReunion;
+import com.zenika.gestion_salles.exception.ReunionNotFoundAnySalle;
 import com.zenika.gestion_salles.mapper.ReunionMapper;
 import com.zenika.gestion_salles.repository.ReunionRepo;
 import com.zenika.gestion_salles.repository.SalleRepo;
@@ -60,8 +61,9 @@ public class ReunionServiceImpl implements ReunionService {
         LocalDateTime now=getDateDuringReserve();
         List<Salle> salles=salleRepo.findAll();
 
+
         List<Salle> sallesPerfect = getSallesRespectConditionReunion(reunion,salles);
-        if(sallesPerfect.isEmpty()) throw new RuntimeException("aucun salle disponible for this reunion");
+        if(sallesPerfect.isEmpty()) throw new ReunionNotFoundAnySalle("no salle disponible for this reunion");
 
 
         List<Reunion> reunions = getBestSalleForReunion(reunion,sallesPerfect,now);
@@ -71,7 +73,7 @@ public class ReunionServiceImpl implements ReunionService {
         Reunion reunionCourante ;
         Reunion reunionSuivante ;
         if (reunions.isEmpty()){
-            logger.info("salle empty");
+            logger.info("salle is empty");
             return reserveReunionDate(reunion, now.plusHours(1).withMinute(0));
         }
         //deja verifier si il exist le premier
@@ -162,8 +164,7 @@ public class ReunionServiceImpl implements ReunionService {
 
     boolean isSalleRespectConditionReunion(Salle salle,Reunion reunion){
 
-        if(reunion.getType().equals(TypeReunion.RC)){
-
+        if(reunion.getType()==TypeReunion.RS){
             if(salle.getCapacite()<3)
                 return false;
         }else {
@@ -173,6 +174,8 @@ public class ReunionServiceImpl implements ReunionService {
 
         }
 
+
+
         return (reunion.getNbrPersonEnSite()<=salle.getCapacite()*0.7);
 
     }
@@ -181,17 +184,14 @@ public class ReunionServiceImpl implements ReunionService {
 
         LocalDateTime localDateTime = LocalDateTime.now();
         DayOfWeek dayOfWeek = localDateTime.getDayOfWeek();
-        int hour=localDateTime.getHour();
 
         int nbrDayAdd=0;
-
 
         if (dayOfWeek == DayOfWeek.SATURDAY) nbrDayAdd=1;
         else if (dayOfWeek == DayOfWeek.SUNDAY) nbrDayAdd=2;
 
-        if((hour < 8 || hour +ReservationInfo.DELAIS_REUNION_HEURE >= 20) )
-            hour=8;
 
+        //suppose 8-9 delay reservation
         return localDateTime.plusDays(nbrDayAdd).withHour(8).withMinute(0);
     }
 

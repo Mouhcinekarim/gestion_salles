@@ -21,8 +21,12 @@ public class ReunionControllerImpl implements ReunionController {
     }
 
     @Override
-    public ResponseEntity cancelReunion(long reunionId) {
-        return null;
+    public ResponseEntity<HttpStatus> cancelReunion(long reunionId) {
+
+        reunionService.cancelReunion(reunionId);
+
+        return  new ResponseEntity<>(HttpStatus.OK);
+
     }
 
     @Override

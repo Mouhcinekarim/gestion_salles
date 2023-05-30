@@ -17,7 +17,7 @@ public class SalleMapperImp implements SalleMapper {
                 .capacite(salle.getCapacite())
                 .equipements(
                         Optional.of(salle.getEquipements()).orElse(null)
-                                .stream().map(e->e.name()).toList()
+                                .stream().map(Enum::name).toList()
                         )
                 .nomSalle(salle.getNomSalle())
                 .build();
@@ -31,7 +31,7 @@ public class SalleMapperImp implements SalleMapper {
                 .nomSalle(dto.getNomSalle())
                 .equipements(
                         Optional.of(dto.getEquipements()).orElse(null).stream()
-                                .map(e-> Equipement.valueOf(e)).toList()
+                                .map(Equipement::valueOf).toList()
                 )
                 .build();
     }
